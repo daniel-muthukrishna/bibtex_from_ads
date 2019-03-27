@@ -10,7 +10,8 @@ def get_bibtex_from_ads_url(url, name=None):
     url : str
         url of abstract on ADS. E.g.: http://adsabs.harvard.edu/abs/2019arXiv190302557M
     name : str
-        replace name of bibtex entry article with this name
+        Optional Argument. If specified it replaces the name of the bibtex entry article with this name.
+        Otherwise, the bibtex entry is named AuthorYear[Firstword of title][Lastword of title]
     """
 
     _, _, domain, _, bibcode = url.split('/')
@@ -34,10 +35,13 @@ def get_bibtex_from_ads_url(url, name=None):
     return bibtex_entry
 
 
-def create_bib_file(urls, names):
+def create_bib_file(urls, names=None):
     entries = []
-    for url in urls:
-        bibtex_entry = get_bibtex_from_ads_url(url)
+    for i, url in enumerate(urls):
+        if names:
+            bibtex_entry = get_bibtex_from_ads_url(url, names[i])
+        else:
+            bibtex_entry = get_bibtex_from_ads_url(url)
         entries.append(bibtex_entry)
 
     with open('references.bib', 'w') as f:
