@@ -2,15 +2,16 @@ import urllib.request
 import re
 
 
-def get_bibtex_from_ads_url(url, name=None):
+def get_bibtex_from_ads_url(url, bibtag=None):
     """ Get bibtex entry from ads link. Return bibtex as text
 
     Parameters
     ----------
     url : str
         url of abstract on ADS. E.g.: http://adsabs.harvard.edu/abs/2019arXiv190302557M
-    name : str
+    bibtag : str
         Optional Argument. If specified it replaces the name of the bibtex entry article with this name.
+        If bibtag='default', then it uses the defualt bibtag given on the ADS.
         Otherwise, the bibtex entry is named AuthorYear[Firstword of title][Lastword of title]
     """
 
@@ -21,13 +22,15 @@ def get_bibtex_from_ads_url(url, name=None):
        html = str(response.read())
 
     bibtex_entry = re.sub(r'.*@', '@', html)
-    if not name:
+    if not bibtag:
         author = bibtex_entry.split('author = {{')[1].split('}')[0]
         year = bibtex_entry.split('year = ')[1].split(',')[0]
         titlelist = bibtex_entry.split('title = "{')[1].split('}')[0].split()
-        name = author + year + titlelist[0] + titlelist[-1]
+        bibtag = author + year + titlelist[0] + titlelist[-1]
 
-    bibtex_entry = bibtex_entry.replace(bibcode, name)
+    if bibtag != 'default':
+        bibtag_default = bibtex_entry.split('{')[1].split(',')[0]
+        bibtex_entry = bibtex_entry.replace(bibtag_default, bibtag, 1)
     bibtex_entry = bibtex_entry.replace('\\n', '\n')
     bibtex_entry = bibtex_entry.replace('\\t', '')
     bibtex_entry = bibtex_entry.rstrip('\'')
@@ -57,10 +60,10 @@ if __name__ == '__main__':
 
         ('http://adsabs.harvard.edu/abs/2017hsn..book..375J', 'SNIax_1'),
 
-        ('http://adsabs.harvard.edu/abs/2010PASP..122.1415K', 'SNII_2'),
+        ('http://adsabs.harvard.edu/abs/2010PASP..122.1415K', 'SNII_1'),
         ('http://adsabs.harvard.edu/abs/2018PASP..130k4504P', 'SNII_2'),
-        ('http://adsabs.harvard.edu/abs/2018ApJS..236....6G', 'SNII_2'),
-        ('http://adsabs.harvard.edu/abs/2017ApJ...849...70V', 'SNII_2'),
+        ('http://adsabs.harvard.edu/abs/2018ApJS..236....6G', 'SNII_3'),
+        ('http://adsabs.harvard.edu/abs/2017ApJ...849...70V', 'SNII_4'),
 
         ('http://adsabs.harvard.edu/abs/2010PASP..122.1415K', 'SNIbc_1'),
         ('http://adsabs.harvard.edu/abs/2018PASP..130k4504P', 'SNIbc_2'),
